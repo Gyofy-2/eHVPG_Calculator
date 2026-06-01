@@ -6,6 +6,8 @@ data/
 *.nii
 *.nii.gz
 *.npz
+*.tif
+*.tiff
 
 # OS / 에디터
 .DS_Store

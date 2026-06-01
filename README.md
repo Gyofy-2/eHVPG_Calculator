@@ -1,58 +1,74 @@
 # eHVPG Calculator
 
-혈청 지표(INR, Albumin, Sodium, Platelet, Total Bilirubin)를 이용해
-간정맥압력차(HVPG, Hepatic Venous Pressure Gradient)를 추정하는 정적 웹 계산기입니다.
+A static web calculator that estimates the Hepatic Venous Pressure Gradient (HVPG)
+from serum markers (INR, Albumin, Sodium, Platelet, Total Bilirubin).
 
-> ⚠️ **연구·교육 목적 전용.** 실제 임상 진단·치료 결정에 단독으로 사용하지 마십시오.
-> HVPG의 표준 측정은 침습적 카테터 검사이며, 본 추정값은 이를 대체하지 않습니다.
+> ⚠️ **For research and educational use only.** Do not use alone for clinical diagnosis
+> or treatment decisions.
 
-## Model Equation
+## Features
 
-```
-PRESS = 37.31 + 5.63·INR − 2.56·Albumin − 0.16·Sodium
-        − 12.31·Platelet(×10⁻⁶/µL) + 0.48·Total Bilirubin
-```
+- **Single calculation** — enter the five parameters and get an estimated HVPG (mmHg).
+- **Batch from CSV** — upload a CSV and download a result CSV with the estimate per row.
+  - **Auto column detection** with a substring fallback (e.g. `inr_value`, `Alb_g_dl`,
+    `Plt count`, `Sodium level` are recognized automatically).
+  - **Manual column mapping** — if a column is not recognized, pick it from a dropdown,
+    so files with any column naming (including non-English headers) can still be used.
+  - **Platelet unit selector** — `/µL` (raw count, e.g. 139000) or `×10³/µL` (e.g. 139).
+  - **Runs entirely in the browser** — the file is never uploaded to any server.
 
-결과 단위는 mmHg-equivalent. 임상적으로 유의한 문맥압항진증(CSPH)의
-통상 기준은 HVPG ≥ 10 mmHg.
+## Input Units
 
-## 입력 단위
-
-| 변수 | 단위 | 비고 |
+| Variable | Unit | Notes |
 |---|---|---|
-| INR | dimensionless | 일반 범위 0.8–3.0 |
+| INR | dimensionless | typical range 0.8–3.0 |
 | Albumin | g/dL | |
 | Sodium (Na) | mmol/L | |
-| Platelet | ×10³/µL (= ×10⁹/L) | 예: 139,000/µL → `139` 입력. 모델 변수는 입력값 × 10⁻³ |
+| Platelet | ×10³/µL (single) / selectable (batch) | single input uses ×10³/µL; batch lets you choose `/µL` or `×10³/µL` |
 | Total Bilirubin | mg/dL | |
 
-## 실행
+## Output
 
-빌드 과정이 없는 순수 정적 사이트입니다.
+An estimated HVPG in mmHg-equivalent.
 
-```bash
-# 로컬 미리보기
-python3 -m http.server 8000
-# http://localhost:8000 접속
+Batch mode downloads `<input-name>_eHVPG.csv` with the columns:
+
+```
+row, INR, Albumin, Sodium, Platelet_per_uL, Total_Bilirubin, eHVPG_mmHg, note
 ```
 
-## 배포 (GitHub Pages)
+Original columns from the uploaded file are not carried over. Rows with missing or
+invalid values are left blank with a reason in the `note` column.
 
-1. 이 저장소를 GitHub에 push
+## Run Locally
+
+A pure static site with no build step.
+
+```bash
+python3 -m http.server 8000
+# open http://localhost:8000
+```
+
+## Deploy (GitHub Pages)
+
+1. Push this repository to GitHub
 2. **Settings → Pages → Build and deployment → Source: `Deploy from a branch`**
-3. Branch: `main` / `/ (root)` 선택 후 저장
-4. 잠시 후 `https://<user>.github.io/eHVPG_Calculator/` 에서 접속 가능
+3. Select Branch: `main` / `/ (root)` and save
+4. The site is served at `https://<user>.github.io/eHVPG_Calculator/`
 
-## 파일 구조
+## Project Structure
 
 ```
 eHVPG_Calculator/
-├── index.html    # 페이지 마크업
-├── styles.css    # 스타일
-├── script.js     # 계산 로직
+├── index.html      # page markup
+├── styles.css      # styles
+├── script.js       # single + batch calculation logic
+├── assets/         # logos
 └── README.md
 ```
 
-## 데이터 정책
+## Data Policy
 
-의료 데이터(CSV/DICOM 등)는 저장소에 포함하지 않습니다 (`.gitignore`로 차단).
+Medical data (CSV/DICOM, etc.) is never committed to this repository (blocked via
+`.gitignore`). Batch CSV processing happens locally in the browser; uploaded files are
+not sent anywhere.

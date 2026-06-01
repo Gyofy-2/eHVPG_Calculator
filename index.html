@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>eHVPG Calculator — Estimated Hepatic Venous Pressure Gradient</title>
-  <meta name="description" content="혈청 지표 기반 간정맥압력차(HVPG) 추정 계산기 — 연구·교육용" />
+  <meta name="description" content="Serum-marker based estimation of the Hepatic Venous Pressure Gradient (HVPG) — for research and educational use." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,7 +12,7 @@
   <header class="site-header">
     <div class="wrap">
       <h1 class="brand">eHVPG <span>Calculator</span></h1>
-      <p class="tagline">Estimated Hepatic Venous Pressure Gradient — 혈청 지표 기반 추정 계산기</p>
+      <p class="tagline">Estimated Hepatic Venous Pressure Gradient — serum-marker based estimation</p>
     </div>
   </header>
 
@@ -22,37 +22,37 @@
       <form id="calc-form" novalidate>
         <div class="field">
           <label for="inr">INR <span class="unit">(dimensionless)</span></label>
-          <input type="number" id="inr" name="inr" step="0.01" min="0" placeholder="예: 1.2" inputmode="decimal" />
-          <small class="hint">국제표준화비율 · 일반 범위 0.8–3.0</small>
+          <input type="number" id="inr" name="inr" step="0.01" min="0" placeholder="e.g. 1.2" inputmode="decimal" />
+          <small class="hint">International Normalized Ratio · typical range 0.8–3.0</small>
         </div>
 
         <div class="field">
           <label for="albumin">Albumin <span class="unit">g/dL</span></label>
-          <input type="number" id="albumin" name="albumin" step="0.1" min="0" placeholder="예: 3.6" inputmode="decimal" />
-          <small class="hint">혈청 알부민 · 데이터 범위 2.0–5.6</small>
+          <input type="number" id="albumin" name="albumin" step="0.1" min="0" placeholder="e.g. 3.6" inputmode="decimal" />
+          <small class="hint">Serum albumin · dataset range 2.0–5.6</small>
         </div>
 
         <div class="field">
           <label for="sodium">Sodium (Na) <span class="unit">mmol/L</span></label>
-          <input type="number" id="sodium" name="sodium" step="1" min="0" placeholder="예: 139" inputmode="decimal" />
-          <small class="hint">혈청 나트륨 · 데이터 범위 117–149</small>
+          <input type="number" id="sodium" name="sodium" step="1" min="0" placeholder="e.g. 139" inputmode="decimal" />
+          <small class="hint">Serum sodium · dataset range 117–149</small>
         </div>
 
         <div class="field">
           <label for="platelet">Platelet <span class="unit">×10³/µL (= ×10⁹/L)</span></label>
-          <input type="number" id="platelet" name="platelet" step="1" min="0" placeholder="예: 139" inputmode="decimal" />
-          <small class="hint">혈소판 수 · 예: 139,000/µL → 139 입력</small>
+          <input type="number" id="platelet" name="platelet" step="1" min="0" placeholder="e.g. 139" inputmode="decimal" />
+          <small class="hint">Platelet count · e.g. 139,000/µL → enter 139</small>
         </div>
 
         <div class="field">
           <label for="bilirubin">Total Bilirubin <span class="unit">mg/dL</span></label>
-          <input type="number" id="bilirubin" name="bilirubin" step="0.01" min="0" placeholder="예: 1.0" inputmode="decimal" />
-          <small class="hint">총 빌리루빈 · 데이터 범위 0.18–29</small>
+          <input type="number" id="bilirubin" name="bilirubin" step="0.01" min="0" placeholder="e.g. 1.0" inputmode="decimal" />
+          <small class="hint">Total bilirubin · dataset range 0.18–29</small>
         </div>
 
         <div class="actions">
-          <button type="button" id="calc-btn" class="primary">계산하기</button>
-          <button type="reset" id="reset-btn" class="ghost">초기화</button>
+          <button type="button" id="calc-btn" class="primary">Calculate</button>
+          <button type="reset" id="reset-btn" class="ghost">Reset</button>
         </div>
         <p id="error-msg" class="error" role="alert" hidden></p>
       </form>
@@ -65,42 +65,67 @@
         <span class="result-unit">mmHg</span>
       </div>
       <p id="interpretation" class="interpretation"></p>
-
-      <details class="breakdown">
-        <summary>계산 상세 (term breakdown)</summary>
-        <table id="breakdown-table">
-          <thead><tr><th>Term</th><th>Coefficient</th><th>Value</th><th>Contribution</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </details>
     </section>
 
-    <section class="card formula">
-      <h2>Model Equation</h2>
-      <p class="eq">
-        PRESS = 37.31 + 5.63·INR − 2.56·Albumin − 0.16·Sodium
-        − 12.31·Platelet(×10⁻⁶/µL) + 0.48·Total&nbsp;Bilirubin
-      </p>
+    <section class="card batch">
+      <h2>Batch from CSV</h2>
       <p class="note">
-        결과는 mmHg 단위의 HVPG 추정치(mmHg-equivalent)입니다.
-        Platelet 항은 혈소판 수(/µL)에 10⁻⁶을 곱한 값을 사용합니다
-        (입력 ×10³/µL × 10⁻³ = ×10⁻⁶/µL).
+        Upload a CSV containing columns for INR, Albumin, Sodium (Na), Platelet (PLT)
+        and Total Bilirubin (TB). Each row is computed and a result CSV
+        (<code>row, INR, Albumin, Sodium, Platelet_per_uL, Total_Bilirubin, eHVPG_mmHg, note</code>)
+        is downloaded. Original columns are not carried over.
+        Processing happens entirely in your browser — the file is never uploaded.
       </p>
+
+      <div class="field">
+        <label for="plt-unit">Platelet unit in the CSV</label>
+        <select id="plt-unit">
+          <option value="perul">/µL — raw count (e.g. 139000)</option>
+          <option value="k">×10³/µL (e.g. 139)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="csv-file">CSV file</label>
+        <div class="file-control">
+          <label for="csv-file" class="file-btn">Choose File</label>
+          <input type="file" id="csv-file" accept=".csv,text/csv" class="visually-hidden" />
+          <span id="file-name" class="file-name">No file selected</span>
+        </div>
+      </div>
+
+      <div id="column-map" class="column-map" hidden>
+        <p class="map-title">Match each parameter to a column in your file:</p>
+        <div id="column-map-rows"></div>
+      </div>
+
+      <p id="batch-status" class="batch-status"></p>
+
+      <div class="actions">
+        <button type="button" id="batch-download" class="primary" disabled>
+          Calculate &amp; Download CSV
+        </button>
+      </div>
     </section>
 
     <section class="card disclaimer">
       <p>
-        <strong>⚠️ Disclaimer.</strong> 본 계산기는 <strong>연구·교육 목적</strong>의 추정 도구이며,
-        실제 임상 진단·치료 결정에 단독으로 사용해서는 안 됩니다.
-        HVPG의 표준 측정은 침습적 카테터 검사이며, 본 추정값은 이를 대체하지 않습니다.
-        임상적 의의가 있는 문맥압항진증(CSPH)의 통상 기준은 HVPG ≥ 10 mmHg입니다.
+        <strong>⚠️ Disclaimer.</strong> This calculator is an estimation tool intended for
+        <strong>research and educational purposes only</strong>. It must not be used alone
+        for clinical diagnosis or treatment decisions.
       </p>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap">
-      <p>eHVPG Calculator · 연구·교육용 · For research and educational use only</p>
+      <div class="logos">
+        <img src="assets/laibi-logo.png" class="logo logo-laibi"
+             alt="LAIBI — Lab of AI in Biomedical Informatics" />
+        <img src="assets/wsch-logo.png" class="logo logo-wsch"
+             alt="Wonju Severance Christian Hospital" />
+      </div>
+      <p>eHVPG Calculator · For research and educational use only</p>
     </div>
   </footer>
 
