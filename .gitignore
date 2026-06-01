@@ -1,0 +1,19 @@
+# 의료 데이터 (원격 업로드 금지)
+data/
+*.csv
+*.xlsx
+*.dcm
+*.nii
+*.nii.gz
+*.npz
+
+# OS / 에디터
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 캐시
+__pycache__/
+*.pyc
+node_modules/
